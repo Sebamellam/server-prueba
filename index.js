@@ -30,7 +30,7 @@ app.use(express.json());
 
 const mercadopago = require("mercadopago")
 const { update } = require('./models/Product')
-const Product = require('./models/Product')
+
 
 mercadopago.configure({
     access_token: process.env.PROD_ACCESS_TOKEN
@@ -62,7 +62,7 @@ app.get("/obtener-producto/:id", async (req, res) => {
 
     try {
         
-        const product = await product.findById(id)
+        const product = await Producto.findById(id)
 
         res.json({
             product
@@ -87,7 +87,7 @@ app.post("/crear-producto", async (req, res) => {
 
     try {
 
-        const nuevoProducto = await Producto.create({ nombre, precio, descripcion, color })
+        const nuevoProducto = await Producto.create({ nombre, precio, descripcion, imagen })
 
         res.json(nuevoProducto)
 
