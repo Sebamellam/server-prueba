@@ -9,9 +9,8 @@ const auth = require('./middleware/authorization')
 
 const connectDB = require('./config/db')
 
-const Guitarra = require('./models/Guitar')
+const Producto = require('./models/Product')
 const Usuario = require('./models/User')
-
 
 
 // 2. MIDDLEWARES
@@ -31,6 +30,7 @@ app.use(express.json());
 
 const mercadopago = require("mercadopago")
 const { update } = require('./models/Product')
+const Product = require('./models/Product')
 
 mercadopago.configure({
     access_token: process.env.PROD_ACCESS_TOKEN
@@ -39,7 +39,7 @@ mercadopago.configure({
 
 // 3. RUTEO
 
-// A. GUITARRAS
+// A. PRODUCTOS
 
 app.get("/obtener-productos", async (req, res) => {
     try {
@@ -56,13 +56,13 @@ app.get("/obtener-productos", async (req, res) => {
     }
 })
 
-app.get("/obtener-productos/:id", async (req, res) => {
+app.get("/obtener-producto/:id", async (req, res) => {
 
     const { id } = req.params
 
     try {
         
-        const guitar = await Producto.findById(id)
+        const product = await product.findById(id)
 
         res.json({
             product
@@ -77,43 +77,43 @@ app.get("/obtener-productos/:id", async (req, res) => {
 
 })
 
-app.post("/crear-guitarra", async (req, res) => {
+app.post("/crear-producto", async (req, res) => {
 
     const {
         nombre,
         precio,
-        imagen,
+        descripcion,
         color } = req.body
 
     try {
 
-        const nuevaGuitarra = await Guitarra.create({ nombre, precio, imagen, color })
+        const nuevoProducto = await Producto.create({ nombre, precio, descripcion, color })
 
-        res.json(nuevaGuitarra)
+        res.json(nuevoProducto)
 
     } catch (error) {
 
         res.status(500).json({
-            msg: "Hubo un error creando la guitarra",
+            msg: "Hubo un error creando el producto",
             error
         })
 
     }
 })
 
-app.put("/actualizar-guitarra", async (req, res) => {
+app.put("/actualizar-producto", async (req, res) => {
 
     const { id, nombre, precio } = req.body
 
     try {
-        const actualizacionGuitarra = await Guitarra.findByIdAndUpdate(id, { nombre, precio }, { new: true })
+        const actualizacionProducto = await Producto.findByIdAndUpdate(id, { nombre, precio }, { new: true })
 
-        res.json(actualizacionGuitarra)
+        res.json(actualizacionProducto)
 
     } catch (error) {
 
         res.status(500).json({
-            msg: "Hubo un error actualizando la guitarra"
+            msg: "Hubo un error actualizando la producto"
         })
 
     }
@@ -121,20 +121,20 @@ app.put("/actualizar-guitarra", async (req, res) => {
 
 })
 
-app.delete("/borrar-guitarra", async (req, res) => {
+app.delete("/borrar-producto", async (req, res) => {
 
     const { id } = req.body
 
     try {
 
-        const guitarraBorrada = await Guitarra.findByIdAndRemove({ _id: id })
+        const productoBorrado = await Producto.findByIdAndRemove({ _id: id })
 
-        res.json(guitarraBorrada)
+        res.json(productoBorrado)
 
 
     } catch (error) {
         res.status(500).json({
-            msg: "Hubo un error borrando la guitarra especificada"
+            msg: "Hubo un error borrando el producto especificado"
         })
     }
 
@@ -172,7 +172,7 @@ app.post("/usuario/crear", async (req, res) => {
         // 2. FIRMAR EL JWT
         jwt.sign(
             payload, // DATOS QUE SE ACOMPAÑARÁN EN EL TOKEN
-            process.env.SECRET, // LLAVE PARA DESCIFRAR LA FIRMA ELECTRÓNICA DEL TOKEN,
+            process.env.SECRET_JWT, // LLAVE PARA DESCIFRAR LA FIRMA ELECTRÓNICA DEL TOKEN,
             {
                 expiresIn: 360000 // EXPIRACIÓN DEL TOKEN
             },
